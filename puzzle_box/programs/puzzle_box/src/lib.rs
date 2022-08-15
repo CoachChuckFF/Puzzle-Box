@@ -13,7 +13,7 @@ use program_instructions::claim_spl::*;
 use program_instructions::create_puzzle_box::*;
 use program_instructions::submit_key::*;
 
-declare_id!("FzcS9Lmrwo5R71LjPuucgQqSc3T8xjWWPmbtDQNEpa4j");
+declare_id!("AeyNFWzsb2rhuQpgwoa6mfH6FzxT8FQ62GeBapdKanca");
 
 #[program]
 pub mod puzzle_box {

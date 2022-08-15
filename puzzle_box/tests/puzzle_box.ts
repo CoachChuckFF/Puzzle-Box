@@ -42,6 +42,26 @@ function getProgramProvider(
     ) as Program<PuzzleBox>;
 }
 
+async function puzzleBoxToString(
+    program: Program<PuzzleBox>,
+    puzzleBoxAccount: anchor.web3.PublicKey
+) {
+    const data = await program.account.puzzleBox.fetch(puzzleBoxAccount);
+    const leaderboard = data.leaderboard as any[];
+    let string = "\n------- Puzzle Box -------\n";
+    string += `| Puzzle Box: ${puzzleBoxAccount.toString()}\n`;
+    string += `| Key Count: ${data.keys.length}\n`;
+    string += `| Leaderboard: ${data.keys.length}\n`;
+
+    for (const entry of leaderboard) {
+        string += `| --- ${entry.player} ( ${
+            entry.score
+        } ) @ ${entry.timestamp.toNumber()} \n`;
+    }
+
+    return string;
+}
+
 describe("puzzle_box", async () => {
     // Configure the client to use the local cluster.
     const provider = anchor.AnchorProvider.env();
@@ -158,7 +178,7 @@ describe("puzzle_box", async () => {
         transaction.add(
             anchor.web3.SystemProgram.createAccount({
                 fromPubkey: provider.publicKey,
-                newAccountPubkey: player2Wallet.publicKey,
+                newAccountPubkey: player3Wallet.publicKey,
                 lamports: laportsPerAccount,
                 space: 0,
                 programId: anchor.web3.SystemProgram.programId,
@@ -347,6 +367,25 @@ describe("puzzle_box", async () => {
         }
     });
 
+    it("Submit Key #1 ( Player 2 )", async () => {
+        try {
+            await player2Provider.methods
+                .submitKey()
+                .accounts({
+                    puzzleBoxAccount: puzzleBoxAccount,
+                    playerAccount: player2Account,
+                    keySubmission: puzzleBoxKeypairs[0].publicKey,
+                    systemProgram: anchor.web3.SystemProgram.programId,
+                    player: player2Wallet.publicKey,
+                })
+                .signers([puzzleBoxKeypairs[0]])
+                .rpc();
+        } catch (e) {
+            console.log(e);
+            throw new Error("Solana Error");
+        }
+    });
+
     it("Submit Key #3", async () => {
         try {
             await player1Provider.methods
@@ -449,13 +488,12 @@ describe("puzzle_box", async () => {
     });
 
     it("Print Results", async () => {
-        console.log("Puzzle Box Account: ", puzzleBoxAccount);
-        console.log("Player 1 Account: ", player1Wallet.publicKey);
-        console.log("Player 2 Account: ", player2Wallet.publicKey);
-        console.log("Player 3 Account: ", player3Wallet.publicKey);
+        console.log("Player 1 Account: ", player1Wallet.publicKey.toString());
+        console.log("Player 2 Account: ", player2Wallet.publicKey.toString());
+        console.log("Player 3 Account: ", player3Wallet.publicKey.toString());
 
         console.log(
-            await toyMakerProvider.account.puzzleBox.fetch(puzzleBoxAccount)
+            await puzzleBoxToString(toyMakerProvider, puzzleBoxAccount)
         );
     });
 });
