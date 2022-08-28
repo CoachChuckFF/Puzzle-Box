@@ -1,0 +1,26 @@
+.void {
+    position: fixed;
+    overflow: hidden;
+    z-index: -5;
+    width: 300%;
+    height: 300%;
+
+    background-image: url("./void.png");
+    background-repeat: repeat;
+
+    animation-name: void;
+    animation-duration: 13s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+
+    filter: brightness(10%) blur(1.5px);
+}
+
+@keyframes void {
+    0% {
+        transform: translate3d(-128px, -192px, 0);
+    }
+    100% {
+        transform: translate3d(0px, 0px, 0);
+    }
+}
